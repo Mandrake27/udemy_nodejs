@@ -42,19 +42,32 @@ Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
 
 User.hasOne(Cart);
-Cart.belongsTo(User);
+Cart.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
 
-User.hasOne(Order);
-Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 
 Order.belongsToMany(Product, { through: OrderItem });
 Product.belongsToMany(Order, { through: OrderItem });
 
 sequelize
+  // .sync({ force: true })
   .sync()
+  .then(() => {
+    return User.findByPk(1);
+  })
+  .then(user => {
+    if (!user) {
+      return User.create({ name: 'Miras', email: 'miras@test.com' });
+    }
+    return user;
+  })
+  .then(user => {
+    user.createCart();
+  })
   .then(() => {
     app.listen(3000);
   })
