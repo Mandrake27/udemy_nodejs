@@ -1,8 +1,27 @@
-const { Sequelize } = require("sequelize");
+const { MongoClient } = require('mongodb');
 
-const sequelize = new Sequelize("node-complete", "root", "mandrake37", {
-  dialect: "mysql",
-  host: "localhost",
-});
+let _db;
 
-module.exports = sequelize;
+const mongoConnect = (callback) => {
+	MongoClient.connect('mongodb+srv://mandrake:Futureisunstopable27@mongouniversitytasks.o1uvl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+		.then(client => {
+			console.log('Connected!');
+			_db = client.db('shop');
+			callback()
+		})
+		.catch(err => {
+			throw new Error(err);
+		});
+};
+
+const getDb = () => {
+	if (!_db) {
+		throw new Error('No database!');
+	}
+	return _db;
+};
+
+module.exports = {
+	mongoConnect,
+	getDb
+}
